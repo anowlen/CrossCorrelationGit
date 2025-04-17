@@ -1,3 +1,5 @@
+#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
+
 void setup() {
     Serial.begin(115200);
 
@@ -1692,17 +1694,19 @@ double y[] = {
         float delaySec = shift * Ts; //og not here
         //shift = shift * .01;
         // serial plotter show shift and cros correlation
-        Serial.print(delaySec);//unshow this on the graph, og shift
+        Serial.print((delaySec));//unshow this on the graph, og shift
         Serial.print(",");  
-        Serial.println(r, 3);  // Correlation coefficient (y-axis)
+        //Serial.println(F(r,3));  // Correlation coefficient (y-axis)
         
 
         delay(100); 
     }
     Serial.print("highest r: ");
-    Serial.println(highr,3);
+    int round = (int)(highr+.5*highr);
+    Serial.println(F(round));
+    //Serial.println(F(highr,3));
     Serial.print("corresponding shift: ");
-    Serial.println(highshift),3;
+    //Serial.println(F(highshift),3);
 }
 
 
