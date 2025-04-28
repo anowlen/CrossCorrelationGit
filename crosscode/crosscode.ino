@@ -6,7 +6,7 @@ void setup() {
     Serial.begin(115200);
 
 //NEW DATA
-
+/*
 double x[] = { //this one prints out data correctly
   2.146607,
 2.14654,
@@ -213,7 +213,7 @@ double y[] = {
 1.15586
 };
 
-
+*/
 
  /*old data
     double x[] = {
@@ -7854,8 +7854,8 @@ float y[]{
 
 
 //one minute of data
+//do not use it disconnects the port
 
-/*
 float x[] = {
   0.003737,
 0.013786,
@@ -20262,7 +20262,7 @@ float y[]{
 1.158686
 };
 
-*/
+
 
 
 //pinMode(A0,INPUT);
