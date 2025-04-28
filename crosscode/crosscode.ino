@@ -7855,6 +7855,7 @@ float y[]{
 
 //one minute of data
 //do not use it disconnects the port
+//you have to physicall press reset button on the board
 
 float x[] = {
   0.003737,
