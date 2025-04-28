@@ -210,8 +210,8 @@ double y[] = {
 1.155882,
 1.15586
 };
-*/
 
+*/
 
  /*old data
     double x[] = {
@@ -1232,7 +1232,8 @@ float y[] = {
 
 
 
-//[11,13) //doesnt print out anything on serial monitor,arduino can use around 80% of memory for serial printing?
+//[11,13) //doesnt print out anything on serial monitor for arduino uno, - can print out on R4 minima, arduino can use around 80% of memory for serial printing(?)
+/*
 double x[] = {
   2.510697,
 2.510625,
@@ -1638,10 +1639,10 @@ double y[] = {
 0.901139,
 0.901404
 };
-
+*/
 
 // around 30 seconds of data
-/*
+
 float x[] = {
   0.003737,
 0.013786,
@@ -7847,7 +7848,7 @@ float y[]{
 1.158681,
 1.158686
 };
-*/
+
 
 //pinMode(A0,INPUT);
 //pinMode(A1,INPUT);
