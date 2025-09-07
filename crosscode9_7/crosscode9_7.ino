@@ -4037,8 +4037,8 @@ pinMode(A1,INPUT);
     }
     double denom = sqrt(sx * sy);
 
-    //int maxShift = n / 2;  // Maximum shift range ->have to divide by 2
-    int maxShift2 = 100; //this makes it match the matlab
+    int maxShift2 = n / 2;  // Maximum shift range ->have to divide by 2
+    //int maxShift2 = 100; //this makes it match the matlab
     const float Ts = 0.01; //sample rate
     Serial.println("delay,correlation");  //Serial Plotter
 
