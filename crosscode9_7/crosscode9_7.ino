@@ -4,6 +4,7 @@
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("testing");
     
 
 //10-20 seconds of EVD Flow
@@ -11428,6 +11429,8 @@ pinMode(A1,INPUT);
     mx /= n;
     my /= n;
 
+
+    Serial.println("test");
     // calculate denominator
     for (int i = 0; i < n; i++) {
         sx += (x[i] - mx) * (x[i] - mx);
@@ -11476,10 +11479,12 @@ pinMode(A1,INPUT);
         Serial.println(r,3);  // Correlation coefficient (y-axis)
         */
         
-        Serial.print(delaySec, 5);
+        /* commenting out to see if it works on serial monitor
+        Serial.print(delaySec, 5); 
         Serial.print(',');
         Serial.println(r, 5);
         delay(5);
+        */
         
 
         delay(100); 
