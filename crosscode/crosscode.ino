@@ -22301,6 +22301,9 @@ pinMode(A1,INPUT);
 
     //int maxShift = n / 2;  // Maximum shift range ->have to divide by 2
     int maxShift2 = 100; //this makes it match the matlab
+    //maybe make this 500
+    //make this bigger 9/8 --> this would be 
+    //we sample every 10 ms
     const float Ts = 0.01; //sample rate
     Serial.println("delay,correlation");  //Serial Plotter
 
