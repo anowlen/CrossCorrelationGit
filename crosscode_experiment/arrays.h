@@ -10646,6 +10646,7 @@ float array2[] = {
 
 //14 seconds of data 1024;2523
 
+
 float array1[] = {
   2.196881,
 2.197372,
@@ -13651,6 +13652,7 @@ float array2[] = {
 1.792383,
 1.792359
 };
+
 
 
 //15 seconds 1024;2623
@@ -16861,6 +16863,7 @@ float array2[] = {
 1.785265
 };
 */
+
 
 const int numValues = sizeof(array1) / sizeof(array1[0]);
 #endif

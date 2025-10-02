@@ -89,7 +89,7 @@ pinMode(A1,INPUT);
 
         ///*Commenting this out to see if it will print out other stuff
         Serial.print(delaySec, 2);
-        Serial.print(',');
+        Serial.print(F(','));
         Serial.println(r, 5);
         delay(5);
         //*/
