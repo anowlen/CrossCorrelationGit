@@ -11,8 +11,9 @@ void setup() {
     
 pinMode(A0,INPUT);
 pinMode(A1,INPUT);
-
+    
     float x[numValues]; //copy values from header file into array
+    Serial.println(numValues);
     for (int i = 0; i < numValues; i++) {
     x[i] = array1[i];
     }

@@ -3,7 +3,7 @@
 #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
 
-const int bufSize = 1499;
+const int bufSize = 1500; //14 seconds of data is 1500
 float sensorData1[bufSize];
 float sensorData2[bufSize];
 int index = 0;
