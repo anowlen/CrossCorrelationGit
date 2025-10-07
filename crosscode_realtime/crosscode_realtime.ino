@@ -103,17 +103,31 @@ pinMode(A1,INPUT);
 
 
 void loop() {
-  float currentData1 = analogRead(A0)*5.0/1023.0;
+  float currentData1 = analogRead(A0)*5.000000/1023.000000;
   float currentData2 = analogRead(A1)*5.0*1023.0;
 
   sensorData1[index] = currentData1;
   sensorData2[index] = currentData2;
   index++;
+  Serial.println(index);
+  Serial.println(currentData1,6);
+  
+  
 
-  float average = average_calculate(sensorData1, bufSize);
-  Serial.println(average);
-  Serial.println("hello");
-  delay(100);
+
+
+
+  if (index >= bufSize){
+    float average = average_calculate(sensorData1, bufSize); 
+    //once index reaches the full buffer, then it calculates the average and prints it out
+    Serial.println(average);
+
+    
+    index = 0; //am i clearing this properly
+    // once it reaches the buffer size, then it has to collect new data and start over again
+  }
+
+  delay(10);
 }
 
 void crossCorr(){
