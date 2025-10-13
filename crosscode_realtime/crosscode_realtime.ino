@@ -51,7 +51,7 @@ void loop() {
     Serial.print("highr: ");
     Serial.println(result.highr);
 
-    index = 0; //am i clearing this properly
+    index = 0; //am i clearing this properly -- it doesnt really clear just overwrites
     // once it reaches the buffer size, then it has to collect new data and start over again
   }
   delay(10);
