@@ -120,10 +120,10 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n){ //two arrays, 
         
       //need to return highr, highshift
 
-        delay(100); 
+        //delay(100); 
 
-    result.highr = highr;
-    result.highshift = highshift;
+    //result.highr = highr;
+    //result.highshift = highshift;
     
     }
     result.highr = highr; //correlation
@@ -132,12 +132,3 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n){ //two arrays, 
         
 }
 
-
-float average_calculate(float arr[], int n){ //array and its size
-  float sum = 0;
-  for (int i = 0; i < n; i++){
-    sum += arr[i];
-  }
-  float ave = sum / n;
-  return ave;
-}
