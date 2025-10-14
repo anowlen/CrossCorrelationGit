@@ -54,7 +54,9 @@ void loop() {
     index = 0; //am i clearing this properly -- it doesnt really clear just overwrites
     // once it reaches the buffer size, then it has to collect new data and start over again
   }
-  delay(10);
+  //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
+
+  delay(5); //if sample every 5 ms --> 200 Hz (have to change Ts in function)
 }
 
 
@@ -83,7 +85,8 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n){ //two arrays, 
     double denom = sqrt(sx * sy);
 
     int maxShift2 = 100; //this makes it match the matlab
-    const float Ts = 0.01; //sample rate
+    //const float Ts = 0.01; //sample rate for 100 Hz (delay 10)
+    const float Ts = 0.005; //sample rate for every 5 ms (200 Hz)
     Serial.println("delay,correlation");  //Serial Plotter
 
 
