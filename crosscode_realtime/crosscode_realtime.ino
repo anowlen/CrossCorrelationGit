@@ -33,10 +33,17 @@ void loop() {
 
   sensorData1[index] = currentData1;
   sensorData2[index] = currentData2;
+  Serial.print(sensorData1[index],3);
+  Serial.print(",");
+  Serial.println(sensorData2[index],3);
   index++;
-  if (index % 100 == 0) {
+  
+  /*
+  if (index % 100 == 0) { //this makes sure that it is actually getting values
     Serial.println(index);
   }
+  */
+
   //Serial.println(index);
   //Serial.println(currentData1,6);
 
@@ -48,9 +55,9 @@ void loop() {
 
     crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize);
     Serial.print("highshift: ");
-    Serial.println(result.highshift);
+    Serial.println(result.highshift,4);
     Serial.print("highr: ");
-    Serial.println(result.highr);
+    Serial.println(result.highr,4);
 
     index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
     // once it reaches the buffer size, then it has to collect new data and start over again
@@ -116,10 +123,12 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n) {  //two arrays
     }
     float delaySec = shift * Ts;  //og not here
 
+    /* cross correlation calculations
     Serial.print(delaySec, 5);
     Serial.print(',');
     Serial.println(r, 5);
     delay(5);
+    */
 
     //need to return highr, highshift
 
