@@ -2,21 +2,15 @@ close all
 clearvars
 clc
 
-T = readtable('2mL-min#12.csv');
-%T = readtable('CoolTermSampleData1.csv');
+T = readtable('0.1mL-min#2.csv');
 
 res = 0.01; %resolution in seconds (1/Hz)
-%-100 to 0 to 100
 
 dz1 = T(:,3);
 dz2 = T(:,4);
 
-
-line1 = table2array(dz1(100:5000,:));
-%look at the size of dz1 in workspace and subtract out the last couple of
-%values
-%excluding first 100 and last 100
-line2 = table2array(dz2(100:5000,:));
+line1 = table2array(dz1(100:50000,:));
+line2 = table2array(dz2(100:50000,:));
 % line2 = 0-line2;
 l1 = size(line1);
 n = res:res:l1*res;
@@ -31,11 +25,7 @@ plot(n,line2)
 tmin = 10;
 tmax = 40;
 
-
-[c,lags] = crosscorr(line2, line1,NumLags=500);
-%og 10k
-%NumLags cannot be bigger than array itself of l1
-%NumLags * .01 is the limit
+[c,lags] = crosscorr(line2, line1,NumLags=10000);
 % [c,lags] = xcorr(line1, line2,4000);
 lags = lags*res;
 % lags2 = lags2*res;
