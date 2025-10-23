@@ -6,6 +6,7 @@ clc
 %T = readtable('SampleData10-21-2.csv');
 %T = readtable('SampleData10-21-4.csv');
 T = readtable('15msdelay10-23-1.csv');
+T = readtable('15msdelay-10-23-2-dot88uF.csv')
 
 
 res = 0.01; %resolution in seconds (1/Hz)
@@ -15,8 +16,8 @@ res = .015;
 dz1 = T(:,1);
 dz2 = T(:,2);
 
-line1 = table2array(dz1(1579:3578,:));
-line2 = table2array(dz2(1579:3578,:));
+line1 = table2array(dz1(1638:3637,:));
+line2 = table2array(dz2(1638:3637,:));
 
 % line2 = 0-line2;
 l1 = size(line1);

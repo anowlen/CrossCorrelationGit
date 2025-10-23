@@ -1,11 +1,15 @@
 //set baud rate for 115200
-
+#include <ArduinoBLE.h>
+BLEService customService("180C"); //create bLE service
+BLEIntCharacteristic valueCharacteristic("2A56", BLERead | BLENotify); //sends to phone
 
 #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
 
+//making bufSize smaller to make it work (og 2000)
+const int bufSize = 1500;
 
-const int bufSize = 2000;
+
 float sensorData1[bufSize];
 float sensorData2[bufSize];
 int index = 0;
@@ -21,6 +25,20 @@ void setup() {
   Serial.begin(115200);
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
+
+  //BLE stuff
+  if (!BLE.begin()) {
+    Serial.println("Starting BLE failed!");
+    while (1);
+  }
+
+  BLE.setLocalName("Arduino_R4_BLE");
+  BLE.setAdvertisedService(customService);
+  customService.addCharacteristic(valueCharacteristic);
+  BLE.addService(customService);
+  valueCharacteristic.writeValue(0); //initial value
+  BLE.advertise();
+  Serial.println("BLE device active, waiting for connections...");
 }
 
 
@@ -28,8 +46,11 @@ void setup() {
 
 
 void loop() {
-  float currentData1 = analogRead(A0) * 5.000000 / 1023.000000;
+  float currentData1 = analogRead(A0) * 5.0 / 1023.0;
   float currentData2 = analogRead(A1) * 5.0 / 1023.0;
+
+  BLEDevice central = BLE.central();
+  
 
   sensorData1[index] = currentData1;
   sensorData2[index] = currentData2;
@@ -37,6 +58,8 @@ void loop() {
   Serial.print(sensorData1[index],3);
   Serial.print(",");
   Serial.println(sensorData2[index],3);
+
+
   
   index++;
   
@@ -63,9 +86,18 @@ void loop() {
     Serial.println(result.highr,4);
     
 
+    if (central.connected()){
+      valueCharacteristic.writeValue(result.highshift);
+      
+    }
+
     index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
     // once it reaches the buffer size, then it has to collect new data and start over again
   }
+
+  
+
+
   //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
 
   //delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
