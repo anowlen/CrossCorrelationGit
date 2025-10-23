@@ -1,137 +1,133 @@
-//set baud rate for 115200
+/**********************************************************************
+ *                        Arduino UNO R4 Minima
+ *             Renesas RA4M1 (Arm Cortex-M4), R7FA4M1AB3CFM
+ *                       MCU: R7FA4M1AB3CFM (LQFP64)
+ *
+ *********************************************************************/
+static const int dly_msec = 500;
+static const IRQn_Type IRQn_OVF7 = IRQn_Type(16);    // Valid range is [0,31] but don't use low numbers
+static const IRQn_Type IRQn_PCHGD2 = IRQn_Type(17);  // Valid range is [0,31] but don't use low numbers
+static volatile int t7_cnt = 0;
+static int cnt = 0;
 
-#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
+//*********************************************************************
+void gpt7_ovf_isr() {
+  // Clear interrupt flag
+  R_ICU->IELSR_b[IRQn_OVF7].IR = 0;
+  // Increment GPT7 counter
+  t7_cnt++;
+}
 
+//*********************************************************************
+void pin_change_isr() {
+  // Clear interrupt flag
+  R_ICU->IELSR_b[IRQn_PCHGD2].IR = 0;
+  // Stop GPT7
+  R_GPT7->GTCR_b.CST = 0;
+  // On-board LED off
+  digitalWrite(LED_BUILTIN, LOW);
+  // Clear GPT7 counter
+  t7_cnt = 0;
+}
 
-const int bufSize = 1500; //14 seconds of data is 1500
-float sensorData1[bufSize];
-float sensorData2[bufSize];
-int index = 0;
+//*********************************************************************
+void setup_pin_change_interrupt() {
 
-struct crossCorrReturn{
-  float highr;
-  float highshift;
-};
+  // Pin change interrupt on pin D3/P104/IRQ1
+  // See chapter 1.7 Pin Lists for LQFP64
 
+  // Setup I/O pin P104
+  //R_PFS->PORT[1].PIN[4].PmnPFS_b.PODR = 0b0;   // Low
+  //R_PFS->PORT[1].PIN[4].PmnPFS_b.PDR = 0b0;    // Input
+  //R_PFS->PORT[1].PIN[4].PmnPFS_b.PMR = 0b0;    // I/O pin
 
+  R_PFS->PORT[1].PIN[4].PmnPFS_b.PCR = 0b1;    // Enable pull-up
+  R_PFS->PORT[1].PIN[4].PmnPFS_b.EOFR = 0b10;  // Event on falling edge
+  // Tables 19.5 and onwards
+  R_PFS->PORT[1].PIN[4].PmnPFS_b.ISEL = 0b1;  // Use as IRQn pin
 
+  // The Interrupt Controller Unit (ICU) controls which event signals are linked to the Nested Vector Interrupt Controller
+  // (NVIC), Data Transfer Control (DTC), and Direct Memory Access Controller (DMAC) modules.
+  // See Table 13.3 Interrupt vector table
+  // See Table 13.4 Event table
+  // There are 47 exceptions that can be connected to events, Table 13.3
+  // The first 16 exceptions are fixed NMIs, the first user definable
+  // exception is number 16 = interrupt number 0, valid interrupt numbers are [0, 31]
+  // To assign which event that triggers which interrupt, set:
+  // R_ICU->IELSR[IRQn] = EVENTn;
+
+  // LQFP64 D2/P104/IRQ1, Table 13.4, table 18.3, table 19.5
+  // Select the IRQn_PCHG2 interrupt to be triggered by the pin change event IRQ1 (2)
+  R_ICU->IELSR_b[IRQn_PCHGD2].IELS = ELC_EVENT_ICU_IRQ1;
+  // Install the ISR in the IRQn_PCHGD2 interrupt vector element
+  NVIC_SetVector(IRQn_PCHGD2, (uint32_t)pin_change_isr);
+  // Set a suitable interrupt priority
+  NVIC_SetPriority(IRQn_PCHGD2, 12);
+  // Enable the interrupt
+  NVIC_EnableIRQ(IRQn_PCHGD2);
+}
+
+//*********************************************************************
+void setup_gpt7() {
+
+  // Enable peripherals
+  // RA4M1 User’s Manual: Hardware, chapter 10.2.5, Module stop control register D
+  //R_MSTP->MSTPCRD_b.MSTPD5 = 0;  // Enable 32-bit GPT321 to GPT320, GPT0, GPT1
+  R_MSTP->MSTPCRD_b.MSTPD6 = 0;  // Enable 16-bit GPT167 to GPT162, GPT2-GPT7
+
+  // The Interrupt Controller Unit (ICU) controls which event signals are linked to the Nested Vector Interrupt Controller
+  // (NVIC), Data Transfer Control (DTC), and Direct Memory Access Controller (DMAC) modules.
+  // See Table 13.3 Interrupt vector table
+  // See Table 13.4 Event table
+  // There are 47 exceptions that can be connected to events, Table 13.3
+  // The first 16 exceptions are fixed NMIs, the first user definable
+  // exception is number 16 = interrupt number 0, valid interrupt numbers are [0, 31]
+  // To assign which event that triggers which interrupt, set:
+  // R_ICU->IELSR[IRQn] = EVENTn;
+
+  // Select the IRQn_OVF7 interrupt to be triggered by the GPT7 overflow event (0x95 = 149, Table 13.4)
+  R_ICU->IELSR_b[IRQn_OVF7].IELS = ELC_EVENT_GPT7_COUNTER_OVERFLOW;
+  // Install the ISR in the IRQn_OVF7 interrupt vector element
+  NVIC_SetVector(IRQn_OVF7, (uint32_t)gpt7_ovf_isr);
+  // Set a suitable interrupt priority
+  NVIC_SetPriority(IRQn_OVF7, 12);
+  // Enable the interrupt
+  NVIC_EnableIRQ(IRQn_OVF7);
+
+  // Timer counter
+  R_GPT7->GTCNT = 0;
+  // Timer period, pwm period
+  R_GPT7->GTPR = 48000 - 1;  // OVF interrupt every 1000 usec at PS=1 and f_MCU 48 MHz
+  // Zero timer control register
+  R_GPT7->GTCR = 0;
+  // Timer pre-scaler
+  R_GPT7->GTCR &= ~(0b111 << 24);  // Clear bits, PS = 1
+  //R_GPT7->GTCR |= (0b011 << 24);  // PS = 64, 64/48 = 4/3 usec per TCLK
+  //R_GPT7->GTCR |= (0b101 << 24);  // PS = 1024
+  // Start timer
+  R_GPT7->GTCR_b.CST = 1;
+}
+
+//*********************************************************************
 void setup() {
-    Serial.begin(115200);
-    pinMode(A0,INPUT);
-    pinMode(A1,INPUT);
-
+  Serial.begin(9600);
+  //Serial.dtr();  // Only needed for Arduino R4 Minima
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  setup_gpt7();
+  setup_pin_change_interrupt();
 }
 
-
-
-
-
+//*********************************************************************
 void loop() {
-  float currentData1 = analogRead(A0)*5.000000/1023.000000;
-  float currentData2 = analogRead(A1)*5.0/1023.0;
 
-  sensorData1[index] = currentData1;
-  sensorData2[index] = currentData2;
-  index++;
-  if (index % 100 == 0){
-    Serial.println(index);
-  }
-  //Serial.println(index);
-  //Serial.println(currentData1,6);
+  for (t7_cnt = 0; t7_cnt < dly_msec;) {}
+  digitalWrite(LED_BUILTIN, HIGH);
 
-  if (index >= bufSize){
-    /*float average = average_calculate(sensorData1, bufSize); 
-    //once index reaches the full buffer, then it calculates the average and prints it out
-    Serial.println(average);
-    */
+  for (t7_cnt = 0; t7_cnt < dly_msec;) {}
+  digitalWrite(LED_BUILTIN, LOW);
 
-    crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize);
-    Serial.print("highshift: ");
-    Serial.println(result.highshift);
-    Serial.print("highr: ");
-    Serial.println(result.highr);
-
-    index = 0; //am i clearing this properly -- it doesnt really clear just overwrites
-    // once it reaches the buffer size, then it has to collect new data and start over again
-  }
-  //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
-
-  delay(5); //if sample every 5 ms --> 200 Hz (have to change Ts in function)
+  cnt++;
+  Serial.print(" Counter value = ");
+  Serial.println(cnt);
 }
-
-
-
-
-crossCorrReturn crossCorr_calculate(float x[], float y[], int n){ //two arrays, and the buffersize
-  
-  crossCorrReturn result;
-
-  //this is all just copied over from other cross correlation
-  float mx = 0, my = 0, sx = 0, sy = 0, sxy, r;
-    
-    // Calculate mean
-    for (int i = 0; i < n; i++) {
-        mx += x[i];
-        my += y[i];
-    }
-    mx /= n;
-    my /= n;
-
-    // calculate denominator
-    for (int i = 0; i < n; i++) {
-        sx += (x[i] - mx) * (x[i] - mx);
-        sy += (y[i] - my) * (y[i] - my);
-    }
-    double denom = sqrt(sx * sy);
-
-    int maxShift2 = 100; //this makes it match the matlab
-    //const float Ts = 0.01; //sample rate for 100 Hz (delay 10)
-    const float Ts = 0.005; //sample rate for every 5 ms (200 Hz)
-    Serial.println("delay,correlation");  //Serial Plotter
-
-
-    float highr = -1.0;
-    float highshift = 0;
-    // Calculate and print cross-correlation
-    for (int shift = -maxShift2; shift <= maxShift2; shift++) { //og maxShift
-        sxy = 0;
-
-        for (int i = 0; i < n; i++) {
-            int j = i + shift;
-            if (j < 0 || j >= n) continue;
-            //if (j < 0 || j >= n){
-              //sxy += (x[i] - mx) * (-my);
-            //}
-            else{
-              sxy += (x[i] - mx) * (y[j] - my); 
-            }
-            
-        }
-
-        r = sxy / denom;
-
-        if (r > highr){
-          highr = r;
-          highshift = shift *Ts; //og just shift
-        }
-        float delaySec = shift * Ts; //og not here
-
-        Serial.print(delaySec, 5);
-        Serial.print(',');
-        Serial.println(r, 5);
-        delay(5);
-        
-      //need to return highr, highshift
-
-        //delay(100); 
-
-    //result.highr = highr;
-    //result.highshift = highshift;
-    
-    }
-    result.highr = highr; //correlation
-    result.highshift = highshift; // time offset
-    return result;
-        
-}
-
