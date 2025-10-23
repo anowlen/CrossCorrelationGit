@@ -3,7 +3,6 @@
 #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
 
-//const int bufSize = 1500; //14 seconds of data is 1500 at 10 ms (?) this is when it would stop printing before -->
 
 const int bufSize = 2000;
 float sensorData1[bufSize];
@@ -33,9 +32,11 @@ void loop() {
 
   sensorData1[index] = currentData1;
   sensorData2[index] = currentData2;
+  
   Serial.print(sensorData1[index],3);
   Serial.print(",");
   Serial.println(sensorData2[index],3);
+  
   index++;
   
   /*
@@ -65,7 +66,7 @@ void loop() {
   //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
 
   //delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
-  delay(15); //sample for every 15 ms
+  delay(15); //sample for every 15 ms --> this gives 30 ms of data collection
 }
 
 
