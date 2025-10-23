@@ -64,7 +64,8 @@ void loop() {
   }
   //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
 
-  delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
+  //delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
+  delay(15); //sample for every 15 ms
 }
 
 
@@ -94,7 +95,8 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n) {  //two arrays
 
   int maxShift2 = 100;  //this makes it match the matlab
   //const float Ts = 0.01; //sample rate for 100 Hz (delay 10)
-  const float Ts = 0.005;               //sample rate for every 5 ms (200 Hz)
+  //const float Ts = 0.005;               //sample rate for every 5 ms (200 Hz)
+  const float Ts = .015; //sample rate for every 15ms (67 Hz)
   Serial.println("delay,correlation");  //Serial Plotter
 
 
@@ -123,19 +125,6 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n) {  //two arrays
     }
     float delaySec = shift * Ts;  //og not here
 
-    /* cross correlation calculations
-    Serial.print(delaySec, 5);
-    Serial.print(',');
-    Serial.println(r, 5);
-    delay(5);
-    */
-
-    //need to return highr, highshift
-
-    //delay(100);
-
-    //result.highr = highr;
-    //result.highshift = highshift;
   }
   result.highr = highr;          //correlation
   result.highshift = highshift;  // time offset
