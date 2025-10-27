@@ -1,13 +1,14 @@
 //set baud rate for 115200
 #include <ArduinoBLE.h>
 BLEService customService("180C"); //create bLE service
-BLEIntCharacteristic valueCharacteristic("2A56", BLERead | BLENotify); //sends to phone
+//BLEIntCharacteristic valueCharacteristic("2A56", BLERead | BLENotify); //sends to phone
+BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify); //sends to phone
 
 #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 1500;
+const int bufSize = 2000;
 
 
 float sensorData1[bufSize];
@@ -84,10 +85,20 @@ void loop() {
     Serial.println(result.highshift,4);
     Serial.print("highr: ");
     Serial.println(result.highr,4);
+    //int highshift_print = result.highshift*1000;
+
     
 
     if (central.connected()){
-      valueCharacteristic.writeValue(result.highshift);
+      //int highshift_ms = (int)(result.highshift * 1000.0);
+      
+      //valueCharacteristic.writeValue(highshift_ms);
+      //valueCharacteristic.writeValue(highshift_print);
+      float testing = .5; //trying to see if it can even send a float value
+      valueCharacteristic.writeValue(testing);
+
+      //valueCharacteristic.writeValue(result.highshift);
+      
       
     }
 
@@ -163,6 +174,6 @@ crossCorrReturn crossCorr_calculate(float x[], float y[], int n) {  //two arrays
 
   }
   result.highr = highr;          //correlation
-  result.highshift = highshift;  // time offset
+  result.highshift = highshift;  // time offset times 1000
   return result;
 }
