@@ -8,7 +8,7 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 3000;
+const int bufSize = 500;
 
 
 //float sensorData1[bufSize];
@@ -63,9 +63,10 @@ void loop() {
   sensorData1[index] = currentData1;
   sensorData2[index] = currentData2;
 
-  Serial.print(sensorData1[index], 3);
-  Serial.print(",");
-  Serial.println(sensorData2[index], 3);
+  Serial.print(sensorData1[index]);
+  Serial.print(";");
+  //Serial.println(sensorData2[index], 3)
+  Serial.println(sensorData2[index]);
 
 
 
