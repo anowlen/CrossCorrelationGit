@@ -8,18 +8,20 @@ clc
 T = readtable('15msdelay10-23-1.csv');
 T = readtable('15msdelay-10-23-2-dot88uF.csv');
 T = readtable('10-30-3-buf500.csv');
+T = readtable('10-30-4-buf3000Ts5.csv');
 
 
 %res = 0.01; %resolution in seconds (1/Hz)
-%res = .005; %sample every 5 ms 
-res = .015;
+res = .005; %sample every 5 ms 
+%res = .015;
+
 
 dz1 = T(:,1);
 dz2 = T(:,2);
 
-line1 = table2array(dz1(505:1004,:));
+line1 = table2array(dz1(1466:4465,:));
 line1 = real(line1);
-line2 = table2array(dz2(505:1004,:));
+line2 = table2array(dz2(1466:4465,:));
 line2 = real(line2);
 
 

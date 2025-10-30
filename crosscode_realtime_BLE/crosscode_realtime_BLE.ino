@@ -8,7 +8,7 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 500;
+const int bufSize = 3250;
 
 
 //float sensorData1[bufSize];
@@ -56,6 +56,9 @@ void loop() {
   //float currentData2 = analogRead(A1) * 5.0 / 1023.0;
   int16_t currentData1 = analogRead(A0);
   int16_t currentData2 = analogRead(A1);
+  int16_t Ts_ms = 15;
+  Ts_ms = 5;
+  float Ts = float(Ts_ms)/1000.0;
 
   BLEDevice central = BLE.central();
 
@@ -87,7 +90,7 @@ void loop() {
     Serial.println(average);
     */
 
-    crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize);
+    crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize, Ts);
 
     Serial.print("highshift: (milli*1000)");
     Serial.println(result.highshift);
@@ -120,13 +123,16 @@ void loop() {
   //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
 
   //delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
-  delay(15);  //sample for every 15 ms --> this gives 30 ms of data collection
+  //delay(15);//sample for every 15 ms --> this gives 30 ms of data collection
+  delay(Ts_ms);  
+  
+
 }
 
 
 
 
-crossCorrReturn crossCorr_calculate(int16_t x[], int16_t y[], int n) {  //two arrays, and the buffersize
+crossCorrReturn crossCorr_calculate(int16_t x[], int16_t y[], int n, float Ts) {  //two arrays, and the buffersize
 
   crossCorrReturn result;
 
@@ -151,7 +157,8 @@ crossCorrReturn crossCorr_calculate(int16_t x[], int16_t y[], int n) {  //two ar
   int maxShift2 = 100;  //this makes it match the matlab
   //const float Ts = 0.01; //sample rate for 100 Hz (delay 10)
   //const float Ts = 0.005;               //sample rate for every 5 ms (200 Hz)
-  const float Ts = .015;                //sample rate for every 15ms (67 Hz)
+  //const float Ts = .015;                //sample rate for every 15ms (67 Hz)
+
   Serial.println("delay,correlation");  //Serial Plotter
 
 
