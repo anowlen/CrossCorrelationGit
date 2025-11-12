@@ -8,7 +8,11 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 2000; //2000 * .005 ms should be 10 ms
+const int bufSize = 3250; //
+
+const unsigned long sampleInterval = 5000; // 5 ms
+float Ts = .005; // sample every .005 seconds (5 ms)
+unsigned long lastSample = 0;
 
 
 //float sensorData1[bufSize];
@@ -45,6 +49,8 @@ void setup() {
   valueCharacteristic.writeValue(0);  //initial value
   BLE.advertise();
   Serial.println("BLE device active, waiting for connections...");
+
+  lastSample = micros();
 }
 
 
@@ -52,82 +58,50 @@ void setup() {
 
 
 void loop() {
-  //float currentData1 = analogRead(A0) * 5.0 / 1023.0;
-  //float currentData2 = analogRead(A1) * 5.0 / 1023.0;
-  int16_t currentData1 = analogRead(A0);
-  int16_t currentData2 = analogRead(A1);
-  int16_t Ts_ms = 15;
-  Ts_ms = 5;
-  float Ts = float(Ts_ms)/1000.0;
 
   BLEDevice central = BLE.central();
+  unsigned long nowSample = micros();
 
+  if (nowSample - lastSample >= sampleInterval){
+    lastSample += sampleInterval;
 
-  sensorData1[index] = currentData1;
-  sensorData2[index] = currentData2;
+    int16_t currentData1 = analogRead(A0);
+    int16_t currentData2 = analogRead(A1);
 
-/*
-  Serial.print(sensorData1[index]);
-  Serial.print(";");
-  //Serial.println(sensorData2[index], 3)
-  Serial.println(sensorData2[index]);
-*/ // i think this is slowing it down
-
-
-  index++;
+    sensorData1[index] = currentData1;
+    sensorData2[index] = currentData2;
 
   /*
-  if (index % 100 == 0) { //this makes sure that it is actually getting values
-    Serial.println(index);
-  }
-  */
-  
+    Serial.print(sensorData1[index]);
+    Serial.print(";");
+    //Serial.println(sensorData2[index], 3)
+    Serial.println(sensorData2[index]);
+  */ // i think this is slowing it down
 
-  //Serial.println(index);
-  //Serial.println(currentData1,6);
-
-  if (index >= bufSize) {
-    /*float average = average_calculate(sensorData1, bufSize); 
-    //once index reaches the full buffer, then it calculates the average and prints it out
-    Serial.println(average);
+    index++;
+    /*
+    if (index % 100 == 0) { //this makes sure that it is actually getting values
+      Serial.println(index);
+    }
     */
 
-    crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize, Ts);
 
-    Serial.print("highshift: (milli*1000)");
-    Serial.println(result.highshift);
-    Serial.print("highr: (*1000)");
-    Serial.println(result.highr);
-    //int highshift_print = result.highshift*1000;
+    if (index >= bufSize) {
 
+      crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize, Ts);
+      Serial.print("highshift: (milli*1000)");
+      Serial.println(result.highshift);
+      Serial.print("highr: (*1000)");
+      Serial.println(result.highr);
 
-
-    if (central.connected()) {
-      //int highshift_ms = (int)(result.highshift * 1000.0);
-
-      //valueCharacteristic.writeValue(highshift_ms);
-      //valueCharacteristic.writeValue(highshift_print);
-
-      float scale = (float)result.highshift / 1000;  // scale down to seconds for sending
-      valueCharacteristic.writeValue(scale);
-      //valueCharacteristic.writeValue(.5);
-
-      //valueCharacteristic.writeValue(result.highshift);
-    }
-
-    index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
-    // once it reaches the buffer size, then it has to collect new data and start over again
-  }
-
-
-
-
-  //delay(10); //makes it roughly sample every 10 ms plus some overhead --> less than 100 Hz
-
-  //delay(5);  //if sample every 5 ms --> 200 Hz (have to change Ts in function)
-  //delay(15);//sample for every 15 ms --> this gives 30 ms of data collection
-  delay(Ts_ms);  
-
+      if (central.connected()) {
+        float scale = (float)result.highshift / 1000;  // scale down to seconds for sending
+        valueCharacteristic.writeValue(scale);
+      }
+      index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
+      // once it reaches the buffer size, then it has to collect new data and start over again
+    } 
+}
   
 
 }

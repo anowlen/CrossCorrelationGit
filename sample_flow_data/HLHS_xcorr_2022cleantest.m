@@ -31,7 +31,8 @@ n = res:res:l1*res;
 
 % line1 = movmean(line1,50);
 % line2 = movmean(line2,50);
-figure(1)
+figure();
+subplot(1,2,1);
 plot(n,line1)
 hold on
 plot(n,line2)
@@ -43,12 +44,20 @@ NumLags = 10;
 NumLags = 100;
 %[c,lags] = crosscorr(line2, line1,NumLags);
 [c,lags] = crosscorr(line1, line2, NumLags);
+legend('Signal 1','Signal 2');
+xlabel('Time(s)');
+ylabel('Amplitude (V)');
+title('Input Signals');
 % [c,lags] = xcorr(line1, line2,4000);
 lags = lags*res;
 % lags2 = lags2*res;
 
-figure(2)
+%figure();
+subplot(1,2,2);
 plot(lags,c)
+xlabel('Time(s)');
+ylabel('Cross-Correlation Coefficient');
+title('Cross-Correlation Coefficient vs Time');
 
 
 % figure(3)
