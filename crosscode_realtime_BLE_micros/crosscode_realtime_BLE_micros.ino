@@ -8,7 +8,12 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 3250; //
+const int bufSize = 3440; //
+//sample around like 3-4 seconds for 5Hz
+//5Hz --> 5 waves every second
+// 17 seconds of this is way overkill, i would be taking like 85 samples
+
+
 
 const unsigned long sampleInterval = 5000; // 5 ms
 float Ts = .005; // sample every .005 seconds (5 ms)

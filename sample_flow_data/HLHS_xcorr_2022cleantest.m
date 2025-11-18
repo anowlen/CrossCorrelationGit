@@ -11,7 +11,11 @@ T = readtable('10-30-3-buf500.csv');
 T = readtable('10-30-4-buf3000Ts5.csv');
 T = readtable('11-12-3-buf3250Ts5micros');
 T = readtable('11-13-1-buf3250Ts5microsvoltage');
-
+T = readtable('11-18-1-buf3440Ts5micros5Hz.csv');
+%T = readtable('11-18-2-buf600Ts5micros5Hz.csv');
+%T = readtable('11-18-3-buf300Ts5micros5Hz.csv');
+T = readtable('11-18-4-buf400Ts5micros10Hz.csv');
+T = readtable('11-18-5-buf3440Ts5micros10Hz.csv');
 
 %res = 0.01; %resolution in seconds (1/Hz)
 res = .005; %sample every 5 ms 
@@ -21,10 +25,10 @@ res = .005; %sample every 5 ms
 dz1 = T(:,1);
 dz2 = T(:,2);
 
-line1 = table2array(dz1(3114:3764,:)); %this should be around .2 seconds of data but its graphign more
+line1 = table2array(dz1(3285:6724,:)); %this should be around .2 seconds of data but its graphign more
 %row range of one delay, correlation output to another
 line1 = real(line1);
-line2 = table2array(dz2(3114:3764,:));
+line2 = table2array(dz2(3285:6724,:));
 line2 = real(line2);
 
 
