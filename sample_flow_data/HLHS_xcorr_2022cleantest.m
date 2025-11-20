@@ -16,6 +16,8 @@ T = readtable('11-18-1-buf3440Ts5micros5Hz.csv');
 %T = readtable('11-18-3-buf300Ts5micros5Hz.csv');
 T = readtable('11-18-4-buf400Ts5micros10Hz.csv');
 T = readtable('11-18-5-buf3440Ts5micros10Hz.csv');
+%T = readtable('11-20-3-buf1000Ts5micros.csv');
+T = readtable('11-20-3-buf200Ts5microsreal.csv');
 
 %res = 0.01; %resolution in seconds (1/Hz)
 res = .005; %sample every 5 ms 
@@ -25,10 +27,9 @@ res = .005; %sample every 5 ms
 dz1 = T(:,1);
 dz2 = T(:,2);
 
-line1 = table2array(dz1(3285:6724,:)); %this should be around .2 seconds of data but its graphign more
-%row range of one delay, correlation output to another
+line1 = table2array(dz1(35:234,:)); 
 line1 = real(line1);
-line2 = table2array(dz2(3285:6724,:));
+line2 = table2array(dz2(35:234,:));
 line2 = real(line2);
 
 
@@ -41,7 +42,7 @@ n = res:res:l1*res;
 figure();
 subplot(1,2,1);
 plot(n,line1)
-%xlim([0 1]);
+xlim([0 .2]);
 hold on
 plot(n,line2)
 
@@ -54,7 +55,6 @@ NumLags = 100;
 [c,lags] = crosscorr(line1, line2, NumLags);
 legend('Signal 1','Signal 2');
 xlabel('Time(s)');
-%xlim([0 0.2]);
 ylabel('Amplitude (V)');
 title('Input Signals');
 % [c,lags] = xcorr(line1, line2,4000);

@@ -8,15 +8,14 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 3440; //
+const int bufSize = 200;  //
 //sample around like 3-4 seconds for 5Hz
 //5Hz --> 5 waves every second
 // 17 seconds of this is way overkill, i would be taking like 85 samples
 
 
-
-const unsigned long sampleInterval = 5000; // 5 ms
-float Ts = .005; // sample every .005 seconds (5 ms)
+const unsigned long sampleInterval = 4000;  // 5000 = 5 ms
+float Ts = .004;                            // sample every .005 seconds (5 ms)
 unsigned long lastSample = 0;
 
 
@@ -55,7 +54,7 @@ void setup() {
   BLE.advertise();
   Serial.println("BLE device active, waiting for connections...");
 
-  lastSample = micros(); //time since program started
+  lastSample = micros();  //time since program started
 }
 
 
@@ -67,7 +66,7 @@ void loop() {
   BLEDevice central = BLE.central();
   unsigned long nowSample = micros();
 
-  if (nowSample - lastSample >= sampleInterval){ //are we past the sampling interval
+  if (nowSample - lastSample >= sampleInterval) {  //are we past the sampling interval
     lastSample += sampleInterval;
 
     int16_t currentData1 = analogRead(A0);
@@ -77,9 +76,9 @@ void loop() {
     sensorData2[index] = currentData2;
 
     //convert them to voltages
-    float reading1 = currentData1 * (5.0/1023.0);
-    float reading2 = currentData2 * (5.0/1023.0);
-    
+    float reading1 = currentData1 * (5.0 / 1023.0);
+    float reading2 = currentData2 * (5.0 / 1023.0);
+
     /*
     Serial.print("A0:");
     Serial.println(reading1);
@@ -87,13 +86,15 @@ void loop() {
     Serial.println(reading2);
     */
 
+    
     Serial.print(reading1);
     Serial.print(";");
     Serial.println(reading2);
+    
 
 
 
-  /* these are uncoverted voltages
+    /* these are uncoverted voltages
     Serial.print(sensorData1[index]);
     Serial.print(";");
     //Serial.println(sensorData2[index], 3)
@@ -123,10 +124,8 @@ void loop() {
       }
       index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
       // once it reaches the buffer size, then it has to collect new data and start over again
-    } 
-}
-  
-
+    }
+  }
 }
 
 
