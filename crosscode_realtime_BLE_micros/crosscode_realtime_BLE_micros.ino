@@ -8,14 +8,14 @@ BLEFloatCharacteristic valueCharacteristic("2A56", BLERead | BLENotify);  //send
 
 
 //making bufSize smaller to make it work (og 2000)
-const int bufSize = 200;  //
+const int bufSize = 200;  //this was 200, changing it to 1000 for testing -> make sure to change it back to 200
 //sample around like 3-4 seconds for 5Hz
 //5Hz --> 5 waves every second
 // 17 seconds of this is way overkill, i would be taking like 85 samples
 
 
-const unsigned long sampleInterval = 4000;  // 5000 = 5 ms
-float Ts = .004;                            // sample every .005 seconds (5 ms)
+const unsigned long sampleInterval = 5000;  // 5000 = 5 ms //this was 4000
+float Ts = .005;                            // sample every .005 seconds (5 ms) //.004
 unsigned long lastSample = 0;
 
 
@@ -86,10 +86,12 @@ void loop() {
     Serial.println(reading2);
     */
 
+    //commenting this out to see if it decreases times
+    //Serial.print(reading1);
+    //Serial.print(";");
+    //Serial.println(reading2);
     
-    Serial.print(reading1);
-    Serial.print(";");
-    Serial.println(reading2);
+ 
     
 
 
@@ -113,14 +115,20 @@ void loop() {
     if (index >= bufSize) {
 
       crossCorrReturn result = crossCorr_calculate(sensorData1, sensorData2, bufSize, Ts);
-      Serial.print("highshift: (milli*1000)");
-      Serial.println(result.highshift);
-      Serial.print("highr: (*1000)");
-      Serial.println(result.highr);
+      //Serial.print("highshift: (milli*1000)");
+      //Serial.println(result.highshift);
+      //Serial.print("highr: (*1000)");
+      //Serial.println(result.highr);
 
       if (central.connected()) {
         float scale = (float)result.highshift / 1000;  // scale down to seconds for sending
-        valueCharacteristic.writeValue(scale);
+        //valueCharacteristic.writeValue(scale); commenting this out to just send voltages read
+        //valueCharacteristic.writeValue(float(reading1)); //ruitong verification
+        //valueCharacteristic.writeValue(float(reading2));
+        Serial.print(reading1);
+      Serial.print(";");
+      Serial.println(reading2);
+
       }
       index = 0;  //am i clearing this properly -- it doesnt really clear just overwrites
       // once it reaches the buffer size, then it has to collect new data and start over again
